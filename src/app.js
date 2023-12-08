@@ -8,6 +8,7 @@ import { Server } from 'socket.io'
 import __dirname from './utils.js'
 import path from 'path'
 import mongoose from 'mongoose' 
+import { messageModelo } from './dao/models/messageModelo.js';
 
 const app = express()
 const PORT = 8080
@@ -41,7 +42,7 @@ const server = app.listen(PORT, () => {
 export const io = new Server(server)
 
 let usuarios = []
-let mensajes = []
+let mensajes = messageModelo.find().lean()
 
 io.on("connection", socket => {
     console.log(`Se ha conectado ${socket.id}`)
@@ -53,7 +54,7 @@ io.on("connection", socket => {
     })
 
     socket.on("mensaje", datos => {
-        mensajes.push(datos)
+        messageModelo.create(datos)
         io.emit("nuevoMensaje", datos)
     })
     socket.on("disconnect", () => {
