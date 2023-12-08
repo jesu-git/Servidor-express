@@ -5,17 +5,15 @@ export const router = Router()
 import { ProductsMongo } from '../dao/managerProductsMongo.js'
 import { io } from '../app.js'
 
-const productManager = new ProductsMongo()
-const productsM = await productManager.getProduct()
+const mongo = new ProductsMongo()
 
-console.log(productsM)
-router.get('/', (req, res) => {
+router.get('/', async(req, res) => {
+    let productos = await mongo.getProduct()
     if (req.query.limit === "") return res.status(200).send({ productsM })
     else {
-        let limitation = productsM.slice(0, req.query.limit)
+        let limitation = productos.slice(0, req.query.limit)
         res.status(200).send(limitation)
     }
-
 
 })
 
@@ -25,7 +23,7 @@ router.get('/:id', async(req, res) => {
 
     try {
          
-        let product = await productManager.getProductById(id)
+        let product = await mongo.getProductById(id)
         res.status(200).json(product)
 
     } catch (error) {
@@ -37,6 +35,7 @@ router.get('/:id', async(req, res) => {
 router.post('/', async (req, res) => {
 
     let body = req.body
+    let productsM = await mongo.getProduct()
     let exist = productsM.find(x => x.code === body.code)
     if (exist) res.status(400).json("El code esta en uso")
 
@@ -79,7 +78,7 @@ router.post('/', async (req, res) => {
     let product = body
 
 
-    let respuesta = await productManager.addProducts(product);
+    let respuesta = await mongo.addProducts(product);
     if (!respuesta) return res.status(400).json("No se ha podido agregar el producto")
     else {
         res.status(200).json("Producto ingresado correctamente:")
@@ -92,7 +91,7 @@ router.put('/:id', async (req, res) => {
     let modify = req.body
     let id = parseInt(req.params.id)
 
-    let respuesta = await productManager.update(id, modify)
+    let respuesta = await mongo.update(id, modify)
 
     if (!respuesta) res.status(400).json("No se ha podido actualizar el producto")
     else {
@@ -104,7 +103,7 @@ router.put('/:id', async (req, res) => {
 
 router.delete("/:id", async(req, res) => {
     let id = parseInt(req.params.id)
-    let respuesta = await productManager.deleteProduct(id)
+    let respuesta = await mongo.deleteProduct(id)
 
     if (!respuesta) return res.status(400).json("Error al eliminar, vuelva intentar")
     else {

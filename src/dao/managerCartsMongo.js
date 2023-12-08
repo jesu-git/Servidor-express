@@ -1,16 +1,17 @@
 
 import { CartModelo } from "./models/cartsModelo.js"
 import { ProductsMongo } from "./managerProductsMongo.js"
+import { productModelo } from "./models/productModelo.js"
 
-const pm = new ProductsMongo()
-const cm = new CartModelo()
+const mongo = new ProductsMongo()
+
 export class cartsMongo {
 
-    getCart() {
+    async getCart() {
 
         try {
 
-            return CartModelo.find().lean()
+            return await CartModelo.find().lean()
 
         } catch (error) {
 
@@ -20,53 +21,71 @@ export class cartsMongo {
 
     }
 
-    createCart() {
+    async createCart() {
+        try {
+            let carts = await this.getCart()
+            let id = Math.max(...carts.map(x => x.id), 0) + 1
+            let productsCart = []
 
-        let carts = this.getCart()
 
-        let id = Math.max(carts.map(x => x.id), 0) + 1
-        let productsCart = []
+            let cart = {
+                id,
+                productsCart,
+
+            }
 
 
-        let cart = {
-            id,
-            productsCart,
+            let cartsMongo = await CartModelo.create(cart)
+            return id
 
+
+        } catch (error) {
+
+            console.log("No se pudo crear el carrito", error.message)
         }
 
 
-        let cartsMongo = cm.create(cart)
-        return cart
+
 
     }
 
-    addProductsCart(idC, prodId) {
-
-        let carts = this.getCart()
-        let products1 = pm.getProduct()
-
-        let existProduct = products1.find(x => x.id == prodId)
-        if (!existProduct) return console.log("El producto ingresado no existe en la BD")
+    async addProductsCart(idC, prodId) {
 
 
-        let existCart = carts.findIndex(x => x.id == idC)
-        if (existCart == -1) return console.log("El carrito ingresado no existe")
+        try {
+            let cart = await CartModelo.find({ id: idC }).lean()
+            console.log(cart)
 
-        let cart = carts[existCart]
+        } catch (error) {
 
-        let exist_quantity = cart.productsCart.findIndex(x => x.id == prodId)
-        console.log(exist_quantity)
-        if (exist_quantity == -1) {
+            console.log("Error, carrito no valido", error.menssage)
 
-            cart.productsCart.push({ id: parseInt(prodId), quantity: 1 })
+        }
+        try {
+            let product = await productModelo.find({ id: prodId }).lean()
+            console.log(product)
+        } catch (error) {
 
-        } else {
-
-            cart.productsCart[exist_quantity].quantity++;
+            console.log("Error, producto no se encuentra en DB..", error.menssage)
 
         }
 
-        let cartAdd = cm.updateOne({ idC: id }, prodId)
+        try {
+            let exist_quantity = await cart.productsCarts.find({ productId: productModelo.id })
+            if (exist_quantity == -1) {
+
+                cart.productsCarts.push({ id: parseInt(product.id), quantity: 1 })
+
+            } else {
+
+                cart.productsCarts.quantity++;
+
+            }
+        } catch (error) {
+          console.log("No se puede agregar producto alcarrito", error.menssage)
+        }
+
+        let cartAdd = await CartModelo.updateOne({ id: idC }, { cart })
         return cart
     }
 
@@ -74,7 +93,7 @@ export class cartsMongo {
 
         try {
 
-            let carts = cm.findOne({ id: id })
+            let carts = CartModelo.findOne({ id: id })
             return carts
 
         } catch (error) {

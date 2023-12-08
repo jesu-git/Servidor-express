@@ -1,16 +1,16 @@
 import { productModelo } from "./models/productModelo.js"
-import mongoose from 'mongoose'
 
-const productoModelo = new productModelo()
+
+
 
 export class ProductsMongo {
 
     async getProduct() {
 
         try {
-            return await productModelo.find().lean()
+            return await productModelo.find()
         } catch (error) {
-            console.log("ocurrio un error:",error.message)
+            console.log("ocurrio un error:", error.message)
             return null
         }
 
@@ -20,7 +20,7 @@ export class ProductsMongo {
         let all_products = await this.getProduct()
 
 
-        let id = Math.max(all_products.map(x => x.id), 0) + 1
+        let id = Math.max(...all_products.map(x => x.id), 0) + 1
 
 
         let productNew = { id, ...product }
@@ -55,7 +55,7 @@ export class ProductsMongo {
 
         try {
             let product = productModelo.findOne({ id: id })
-            if(product){
+            if (product) {
                 let productModific = await productModelo.deleteOne({ id: id })
                 return id
 

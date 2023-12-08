@@ -46,10 +46,10 @@ export class carts {
 
     }
 
-    addProductsCart(idC, prodId) {
+    async addProductsCart(idC, prodId) {
 
         let carts = this.getCart()
-        let products1 = pm.getProduct()
+        let products1 = await pm.getProduct()
 
         let existProduct = products1.find(x => x.id == prodId)
         if (!existProduct) return console.log("El producto ingresado no existe en la BD")

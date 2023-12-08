@@ -67,7 +67,7 @@ io.on("connection", socket => {
 })
 
 try {
-   await mongoose.connect("mongodb+srv://suarezjesu90:codercoder@eccommer.u1pd7r0.mongodb.net/?retryWrites=true&w=majority") 
+   await mongoose.connect("mongodb+srv://suarezjesu90:codercoder@eccommer.u1pd7r0.mongodb.net/?retryWrites=true&w=majority",{dbName:'Eccommers'}) 
    console.log("BD conectada!")
 } catch (error) {
 
