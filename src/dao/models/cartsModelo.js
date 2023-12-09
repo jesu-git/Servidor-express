@@ -16,5 +16,4 @@ const schemaCarts = new mongoose.Schema({
     timestamps: true
 })
 
-schemaCarts.pre('find',function(){ this.populate('productCarts.productId')})
 export const CartModelo = mongoose.model(collectionCarts, schemaCarts)

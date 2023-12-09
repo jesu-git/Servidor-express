@@ -52,6 +52,17 @@ export class cartsMongo {
     async addProductsCart(idC, prodId) {
 
         try {
+            let existProduct = await CartModelo.findOne({id:prodId})
+            console.log(existProduct)
+            if(existProduct == null)return null
+            
+        } catch (error) {
+
+            console.log("No se encontro su producto")
+            
+        }
+
+        try {
             let cart = await CartModelo.findOne({ id: idC })
             let product = cart.productCarts.find(x => x.productId == prodId)
 

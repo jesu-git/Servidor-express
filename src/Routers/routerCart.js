@@ -14,7 +14,7 @@ let id = parseInt(req.params.id)
 let respuesta = await cm.getProductId(id)
 console.log(respuesta)
 
-if(!respuesta) return res.status(400).json("El carrito no fue encontrado")
+if(!respuesta || respuesta == null) return res.status(400).json("El carrito no fue encontrado")
 else{res.status(200).json(respuesta)}
 
 })
@@ -32,7 +32,7 @@ router.post('/:id/product/:product', async(req, res) => {
 
     let respuesta = await cm.addProductsCart(idC, prodId)
 
-    if (!respuesta) return res.status(400).json("No se ha podido agrear el producto al carrito")
+    if (!respuesta || respuesta == null) return res.status(400).json("No se ha podido agregar el producto al carrito....")
     else {
         return res.status(200).json("Tu producto ha sido agregado con exito")
     }
