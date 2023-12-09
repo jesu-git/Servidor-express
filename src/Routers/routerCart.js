@@ -9,11 +9,12 @@ import { CartModelo } from '../dao/models/cartsModelo.js'
 
 const cm = new cartsMongo()
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async(req, res) => {
 let id = parseInt(req.params.id)
-let respuesta = cm.getProductId(id)
+let respuesta = await cm.getProductId(id)
+console.log(respuesta)
 
-if(respuesta == -1) return res.status(400).json("El carrito no fue encontrado")
+if(!respuesta) return res.status(400).json("El carrito no fue encontrado")
 else{res.status(200).json(respuesta)}
 
 })
