@@ -48,7 +48,7 @@ Swal.fire({
     mensajes.forEach(mensaje=> {
 
       let parrafo = document.createElement('p')
-      parrafo.innerHTML = `<strong> ${mensaje.emisor}</strong> dice: <i>${mensaje.mensaje}</i>`
+      parrafo.innerHTML = `<strong> ${mensaje.nombre}</strong> dice: <i>${mensaje.mensaje}</i>`
       parrafo.classList.add('mensaje')
       let br = document.createElement('br')
       divMensajes.append(parrafo, br)

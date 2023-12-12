@@ -42,19 +42,20 @@ const server = app.listen(PORT, () => {
 export const io = new Server(server)
 
 let usuarios = []
-let mensajes = messageModelo.find().lean()
+
 
 io.on("connection", socket => {
     console.log(`Se ha conectado ${socket.id}`)
 
-    socket.on("nombre", nombre => {
+    socket.on("nombre", async(nombre) => {
         usuarios.push({ nombre, id: socket.id })
         socket.broadcast.emit("nuevoConectado", nombre)
-        socket.emit("comienzo", mensajes)
+        socket.emit("comienzo", await messageModelo.find().lean())
     })
 
     socket.on("mensaje", async(datos) => {
-        await messageModelo.create({'nombre':datos.nombre ,'mensaje':datos.mensaje})
+        await messageModelo.create({'nombre':datos.emisor ,'mensaje':datos.mensaje})
+        
         io.emit("nuevoMensaje", datos)
     })
     socket.on("disconnect", () => {
