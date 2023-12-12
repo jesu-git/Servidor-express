@@ -53,8 +53,8 @@ io.on("connection", socket => {
         socket.emit("comienzo", mensajes)
     })
 
-    socket.on("mensaje", datos => {
-        messageModelo.create(datos)
+    socket.on("mensaje", async(datos) => {
+        await messageModelo.create({'nombre':datos.nombre ,'mensaje':datos.mensaje})
         io.emit("nuevoMensaje", datos)
     })
     socket.on("disconnect", () => {

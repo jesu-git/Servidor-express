@@ -52,31 +52,38 @@ export class cartsMongo {
     async addProductsCart(idC, prodId) {
 
         try {
-            let existProduct = await CartModelo.findOne({id:prodId})
-            console.log(existProduct)
-            if(existProduct == null)return null
-            
+            let existProduct = await productModelo.findOne({ id: prodId })
+            if (existProduct == null) return null
+
         } catch (error) {
 
             console.log("No se encontro su producto")
-            
+
         }
 
         try {
+
             let cart = await CartModelo.findOne({ id: idC })
             let product = cart.productCarts.find(x => x.productId == prodId)
-
+            console.log(product)
             if (product !== undefined) {
-                await CartModelo.updateOne({ id: idC },{ $set: { 'productCarts.$[prodId]': { 'prodId': prodId, 'quantity': product.quantity + 1 } }})
+
+                let index = cart.productCarts.findIndex(x => x.productId == prodId)
+                cart.productCarts[index].quantity += 1
+
+                await CartModelo.findOneAndUpdate({ id: idC }, {cart})
+
+                return cart
             }
 
             if (product == undefined) {
-                await CartModelo.updateOne({ id:idC }, {$push: { 'productCarts': { productId: prodId, quantity: 1 }}})
+
+                await CartModelo.updateOne({ id: idC }, { $push: { 'productCarts': { productId: prodId, quantity: 1 } } })
+                return idC
             }
-            return idC
         } catch (error) {
 
-            console.log("Error al agregar producto",error.message)
+            console.log("Error al agregar producto", error.message)
 
         }
     }
