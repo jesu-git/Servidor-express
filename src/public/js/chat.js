@@ -13,12 +13,10 @@ Swal.fire({
 }).then(resultado => {
 
   socket.emit("nombre", resultado.value)
-  inputMensaje.focus()
   document.title = `CHAT-${resultado.value}`
 
   socket.on("nuevoConectado", nombre => {
-    //en momentos
-
+   
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",

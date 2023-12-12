@@ -71,7 +71,7 @@ export class cartsMongo {
                 let index = cart.productCarts.findIndex(x => x.productId == prodId)
                 cart.productCarts[index].quantity += 1
 
-                await CartModelo.findOneAndUpdate({ id: idC }, {cart})
+                await CartModelo.findOneAndUpdate({ id: idC },{ $set: { 'productCarts': { productId: prodId, quantity: product.quantity++ } } })
 
                 return cart
             }
