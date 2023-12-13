@@ -70,8 +70,9 @@ export class cartsMongo {
             if (product !== undefined) {
 
                 product.quantity++
-                  console.log(product)
-                await CartModelo.findOneAndUpdate({ _id },{ $set: { 'productCarts': { productId: prodId, quantity: product.quantity} } })
+                let modificado = cart.productCarts
+                console.log("aaaaaaaaaaaaaaaaaaa",modificado)
+                await CartModelo.findOneAndUpdate({ _id },{ 'productCarts': modificado})
 
                 return cart
             }
@@ -85,7 +86,7 @@ export class cartsMongo {
 
             console.log("Error al agregar producto", error.message)
             
-            return null
+            return 
 
         }
     }
