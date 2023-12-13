@@ -1,14 +1,14 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose from 'mongoose'
 
 
 const collectionCarts = 'carts'
 const schemaCarts = new mongoose.Schema({
 
 
-    id: { type: 'number', unique: true },
     productCarts: {
         type: [{
-            productId: {type: Number},
+            productId: {type: mongoose.Schema.Types.ObjectId,
+            ref:'productos'},
             quantity: { type: Number }
         }]
     }
@@ -17,3 +17,9 @@ const schemaCarts = new mongoose.Schema({
 })
 
 export const CartModelo = mongoose.model(collectionCarts, schemaCarts)
+schemaCarts.pre("find",function(){
+
+    this.populate({
+        path:"productos"
+    })
+})

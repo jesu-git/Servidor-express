@@ -2,10 +2,11 @@ console.log("desde el websocket")
 
 const socket = io()
 socket.on("newProduct", product=>{
+
     let ul = document.querySelector('ul')
     let newLi = document.createElement('li')
-    newLi.setAttribute("ID",`${product.id}`)
-    let print = `${product.id}- ${product.title}`
+    newLi.setAttribute("ID",`${product._id}`)
+    let print = `${product._id}-${product.title}`
     newLi.innerHTML =  print
     ul.append(newLi)
     

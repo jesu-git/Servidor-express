@@ -16,8 +16,6 @@ stock: { type: Number, required: true },
 
 category: { type: String, required: true },
 
-id: { type: Number, unique: true },
-
 thumbnails: [String]
 
 }, {

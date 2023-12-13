@@ -23,20 +23,21 @@ export class cartsMongo {
 
     async createCart() {
         try {
-            let carts = await this.getCart()
-            let id = Math.max(...carts.map(x => x.id), 0) + 1
+            //let carts = await this.getCart()
+            //let id = Math.max(...carts.map(x => x.id), 0) + 1
             let productCarts = []
 
 
             let cart = {
-                id,
-                productCarts,
+             
+                productCarts
 
             }
 
 
             let cartsMongo = await CartModelo.create(cart)
-            return id
+            console.log(cartsMongo)
+            return cartsMongo._id
 
 
         } catch (error) {
@@ -49,12 +50,12 @@ export class cartsMongo {
 
     }
 
-    async addProductsCart(idC, prodId) {
-
+    async addProductsCart(_id, prodId) {
+      
         try {
-            let existProduct = await productModelo.findOne({ id: prodId })
+            let existProduct = await productModelo.findOne({ _id:prodId })
             if (existProduct == null) return null
-
+     
         } catch (error) {
 
             console.log("No se encontro su producto")
@@ -63,39 +64,37 @@ export class cartsMongo {
 
         try {
 
-            let cart = await CartModelo.findOne({ id: idC })
+            let cart = await CartModelo.findOne({_id:_id })
             let product = cart.productCarts.find(x => x.productId == prodId)
             console.log(product)
             if (product !== undefined) {
 
-                let index = cart.productCarts.findIndex(x => x.productId == prodId)
-                cart.productCarts[index].quantity += 1
-
-                await CartModelo.findOneAndUpdate({ id: idC },{ $set: { 'productCarts': { productId: prodId, quantity: product.quantity++ } } })
+                product.quantity++
+                  console.log(product)
+                await CartModelo.findOneAndUpdate({ _id },{ $set: { 'productCarts': { productId: prodId, quantity: product.quantity} } })
 
                 return cart
             }
 
             if (product == undefined) {
 
-                await CartModelo.updateOne({ id: idC }, { $push: { 'productCarts': { productId: prodId, quantity: 1 } } })
-                return idC
+                await CartModelo.findByIdAndUpdate({ _id }, { $push: { 'productCarts': { productId: prodId, quantity: 1 } } })
+                return _id
             }
         } catch (error) {
 
             console.log("Error al agregar producto", error.message)
+            
+            return null
 
         }
     }
-
-
-
 
     async getProductId(id) {
 
         try {
 
-            let carts = await CartModelo.findOne({ id: id }).lean()
+            let carts = await CartModelo.findById({ id }).lean()
             return carts
 
         } catch (error) {

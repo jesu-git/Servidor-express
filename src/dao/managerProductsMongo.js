@@ -8,7 +8,7 @@ export class ProductsMongo {
     async getProduct() {
 
         try {
-            return await productModelo.find()
+            return await productModelo.find().lean()
         } catch (error) {
             console.log("ocurrio un error:", error.message)
             return null
@@ -17,19 +17,20 @@ export class ProductsMongo {
     }
     async addProducts(product) {
 
-        let all_products = await this.getProduct()
+        //let all_products = await this.getProduct()
 
 
-        let id = Math.max(...all_products.map(x => x.id), 0) + 1
+        //let id = Math.max(...all_products.map(x => x.id), 0) + 1
 
 
-        let productNew = { id, ...product }
-        if (Object.keys(productNew).length > 9) return console.log("Has ingresados más campos de los requeridos")
+        let productNew = { ...product }
+        if (Object.keys(productNew).length > 8) return console.log("Has ingresados más campos de los requeridos")
 
         try {
 
-            let productoMongo = productModelo.create(productNew)
-            return productNew
+            let productoMongo = await productModelo.create(productNew)
+            let{_id}= productoMongo
+            return productoMongo
 
         } catch (error) {
 
@@ -41,7 +42,7 @@ export class ProductsMongo {
 
 
         try {
-            let products = await productModelo.findOne({ id: id })
+            let products = await productModelo.findById({ id })
 
             return products
         } catch (error) {
@@ -54,9 +55,9 @@ export class ProductsMongo {
     async deleteProduct(id) {
 
         try {
-            let product = productModelo.findOne({ id: id })
+            let product = productModelo.findOne({ _id: id })
             if (product) {
-                let productModific = await productModelo.deleteOne({ id: id })
+                let productModific = await productModelo.deleteOne({ _id: id })
                 return id
 
             }
@@ -66,10 +67,12 @@ export class ProductsMongo {
         }
 
     }
-    async update(id, obj) {
+    async update(_id, obj) {
+
+          console.log(_id)
 
         try {
-            let product = productModelo.findOne({ id: id })
+            let product = productModelo.findById({ id })
 
         }
         catch (error) {
@@ -117,11 +120,12 @@ export class ProductsMongo {
         } catch (error) {
 
             console.log("Verifique sus campos, no son correctos")
-            return
+            return error.menssage
         }
+        console.log(obj)
         try {
-            let productModific = await productModelo.updateOne({ id: id }, obj)
-            return id
+            let productModific = await productModelo.findByIdAndUpdate({ _id }, obj)
+            return _id
         } catch (error) {
 
             console.log("No se pudo modificar el producto")

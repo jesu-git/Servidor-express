@@ -3,13 +3,14 @@ import path from 'path'
 import { Router } from 'express'
 export const router = Router()
 import { ProductsMongo } from '../dao/managerProductsMongo.js'
+import { productModelo } from '../dao/models/productModelo.js'
 import { io } from '../app.js'
 
 const mongo = new ProductsMongo()
 
 router.get('/', async(req, res) => {
     let productos = await mongo.getProduct()
-    if (req.query.limit === "") return res.status(200).send({ productsM })
+    if (req.query.limit === "") return res.status(200).send({ productos })
     else {
         let limitation = productos.slice(0, req.query.limit)
         res.status(200).send(limitation)
@@ -19,11 +20,11 @@ router.get('/', async(req, res) => {
 
 router.get('/:id', async(req, res) => {
 
-    let id = parseInt(req.params.id)
+    let id = req.params.id
 
     try {
          
-        let product = await mongo.getProductById(id)
+        let product = await productModelo.findById(id)
         res.status(200).json(product)
 
     } catch (error) {
@@ -37,7 +38,7 @@ router.post('/', async (req, res) => {
     let body = req.body
     let productsM = await mongo.getProduct()
     let exist = productsM.find(x => x.code === body.code)
-    if (exist) res.status(400).json("El code esta en uso")
+    if (exist) return res.status(400).json("El code esta en uso")
 
     const date = ['title', 'description', 'price', 'code', 'stock', 'category']
 
@@ -89,7 +90,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     let modify = req.body
-    let id = parseInt(req.params.id)
+    let id = req.params.id
 
     let respuesta = await mongo.update(id, modify)
 
@@ -102,7 +103,7 @@ router.put('/:id', async (req, res) => {
 })
 
 router.delete("/:id", async(req, res) => {
-    let id = parseInt(req.params.id)
+    let id = req.params.id
     let respuesta = await mongo.deleteProduct(id)
 
     if (!respuesta) return res.status(400).json("Error al eliminar, vuelva intentar")
