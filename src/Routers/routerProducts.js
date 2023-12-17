@@ -1,29 +1,69 @@
 import __dirname from '../utils.js'
 import path from 'path'
-import { Router } from 'express'
+import { Router, query } from 'express'
 export const router = Router()
 import { ProductsMongo } from '../dao/managerProductsMongo.js'
 import { productModelo } from '../dao/models/productModelo.js'
 import { io } from '../app.js'
 
+
 const mongo = new ProductsMongo()
 
-router.get('/', async(req, res) => {
-    let productos = await mongo.getProduct()
-    if (req.query.limit === "") return res.status(200).send({ productos })
-    else {
-        let limitation = productos.slice(0, req.query.limit)
-        res.status(200).send(limitation)
+router.get('/', async (req, res) => {
+
+    let { limit = 10, page = 1, sort = {}, query } = req.query
+
+    let sortValue = {}
+    if (query == null) {
+        query = {}
     }
+
+    if (sort == "asc") {
+        sortValue = { price: 1 }
+    }
+    if (sort == "desc") {
+        sortValue = { price: -1 }
+    }
+
+    limit = parseInt(limit)
+    page = parseInt(page)
+
+    try {
+
+
+
+        products = await productModelo.paginate(query, { lean: true, limit: limit, page: page, sort: sortValue })
+        let { totalPages, hasNextPage, hasPrevPage, prevPage, nextPage } = products
+        let prevLink = '', nextLink = '';
+        if (hasPrevPage) {
+            prevLink = `localhost:8080/api/products?limit=${limit}&page=${prevPage}`
+        } else { prevLink = null }
+        if (hasNextPage) {
+            nextLink = `localhost:8080/api/products?limit=${limit}&page=${nextPage}`
+        } else { nextLink = null }
+        res.status(200).json( 
+            {
+              status:'sucess',
+              payload: products.docs,
+              totalPages, hasNextPage, hasPrevPage, prevPage, nextPage, prevLink, nextLink
+            }
+           )
+
+
+
+    } catch (error) {
+        res.status(400).send("Error de peticion")
+    }
+
 
 })
 
-router.get('/:id', async(req, res) => {
+router.get('/:id', async (req, res) => {
 
     let id = req.params.id
 
     try {
-         
+
         let product = await productModelo.findById(id)
         res.status(200).json(product)
 
@@ -102,7 +142,7 @@ router.put('/:id', async (req, res) => {
 
 })
 
-router.delete("/:id", async(req, res) => {
+router.delete("/:id", async (req, res) => {
     let id = req.params.id
     let respuesta = await mongo.deleteProduct(id)
 

@@ -17,9 +17,3 @@ const schemaCarts = new mongoose.Schema({
 })
 
 export const CartModelo = mongoose.model(collectionCarts, schemaCarts)
-schemaCarts.pre("find",function(){
-
-    this.populate({
-        path:"productos"
-    })
-})
