@@ -11,50 +11,41 @@ const mongo = new ProductsMongo()
 
 router.get('/', async (req, res) => {
 
-    let { limit = 10, page = 1, sort = {}, query } = req.query
-
+    let { limit = 10, sort = {}, page = 1 } = req.query
     let sortValue = {}
-    if (query == null) {
-        query = {}
-    }
-
-    if (sort == "asc") {
-        sortValue = { price: 1 }
-    }
-    if (sort == "desc") {
+    if (sort === "asc") {
+        sortValue = { price: 1 };
+    } else if (sort === "desc") {
         sortValue = { price: -1 }
     }
 
-    limit = parseInt(limit)
-    page = parseInt(page)
-
+     let category = req.query.category
+     console.log(req.query)
     try {
 
-
-
-        products = await productModelo.paginate(query, { lean: true, limit: limit, page: page, sort: sortValue })
-        let { totalPages, hasNextPage, hasPrevPage, prevPage, nextPage } = products
+        let products = await productModelo.paginate({...category}, { limit: limit, page: page, sort: sortValue })
+        let {totalPages, hasNextPage, hasPrevPage, prevPage, nextPage} = products
         let prevLink = '', nextLink = '';
         if (hasPrevPage) {
-            prevLink = `localhost:8080/api/products?limit=${limit}&page=${prevPage}`
-        } else { prevLink = null }
+          prevLink = `localhost:8080/api/products?limit=${limit}&page=${prevPage}`
+        } else { prevLink = null}
         if (hasNextPage) {
-            nextLink = `localhost:8080/api/products?limit=${limit}&page=${nextPage}`
-        } else { nextLink = null }
-        res.status(200).json( 
+          nextLink = `localhost:8080/api/products?limit=${limit}&page=${nextPage}`
+        } else { nextLink = null}
+        if (!products) {
+          res.status(400).json({ error: 'The products could not be fetched from the DB'})};
+        res.status(200).send(
             {
-              status:'sucess',
-              payload: products.docs,
-              totalPages, hasNextPage, hasPrevPage, prevPage, nextPage, prevLink, nextLink
-            }
-           )
-
-
+            status:'sucess',
+            payload: products.docs,
+            totalPages, hasNextPage, hasPrevPage, prevPage, nextPage, prevLink, nextLink
+          })
 
     } catch (error) {
-        res.status(400).send("Error de peticion")
-    }
 
+        res.status(400).send("Error en la  peticion")
+
+    }
 
 })
 
