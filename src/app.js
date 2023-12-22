@@ -3,18 +3,31 @@ import express from 'express';
 import { router as router_products } from './Routers/routerProducts.js';
 import { router as router_cart } from './Routers/routerCart.js'
 import { router as router_views } from './Routers/routerViews.js'
+import { router as router_session } from './Routers/roueterSessions.js';
 import { engine } from 'express-handlebars'
 import { Server } from 'socket.io'
 import __dirname from './utils.js'
 import path from 'path'
 import mongoose from 'mongoose' 
-import { messageModelo } from './dao/models/messageModelo.js';
-
+import { messageModelo } from './dao/models/messageModelo.js'
+import sessions from 'express-session'
+import MongoStore from 'connect-mongo';
+ 
 const app = express()
 const PORT = 8080
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(sessions({  
+    secret:"coderceder",
+    resave:true,
+    saveUninitialized: true ,
+    store:MongoStore.create({
+        mongoUrl:"mongodb+srv://suarezjesu90:codercoder@eccommer.u1pd7r0.mongodb.net/?retryWrites=true&w=majority",
+        mongoOptions:{dbName:'Eccommers'},
+        ttl:3600
+    })
+}))
 
 app.engine('handlebars',engine());
 app.set('view engine','handlebars')
@@ -31,6 +44,7 @@ app.get("/", (req, res) => {
 app.use('/api/products', router_products)
 app.use('/api/carts', router_cart)
 app.use('/views', router_views)
+app.use('/api/session',router_session)
 
 
 const server = app.listen(PORT, () => {
