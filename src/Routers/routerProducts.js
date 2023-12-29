@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
   
     try {
 
-        let products = await productModelo.paginate({category}, { limit: limit, page: page, sort: sortValue })
+        let products = await productModelo.paginate(category, { limit: limit, page: page, sort: sortValue })
         let {totalPages, hasNextPage, hasPrevPage, prevPage, nextPage} = products
         let prevLink = '', nextLink = '';
         if (hasPrevPage) {
