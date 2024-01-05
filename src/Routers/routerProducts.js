@@ -23,6 +23,9 @@ router.get('/', async (req, res) => {
      console.log(category)
      if(category == undefined || null){
         category = {}
+     }else{
+
+        category = { category:category}
      }
   
     try {
